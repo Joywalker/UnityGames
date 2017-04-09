@@ -23,7 +23,11 @@ public class EnemySpawner : MonoBehaviour
         Vector3 rightBoundary = Camera.main.ViewportToWorldPoint(new Vector3(1, 0, distanceToCamera));
         xmin = leftBoundary.x;
         xmax = rightBoundary.x;
+        SpawnUntilFull();
+    }
 
+    void spawnEnemies()
+    {
         var enemyGroup = transform;
         foreach (Transform singleEnemy in enemyGroup)
         {
@@ -36,10 +40,50 @@ public class EnemySpawner : MonoBehaviour
     {
         Gizmos.DrawWireCube(transform.position, new Vector3(width, height));
     }
+
+    Transform getNextFreePosition()
+    {
+        foreach (Transform childPositionGameObject in transform)
+        {
+            if (childPositionGameObject.childCount == 0)
+            {
+                return childPositionGameObject;
+            }
+        }
+        return null;
+    }
+
+    void SpawnUntilFull()
+    {
+        Transform freePos = getNextFreePosition();
+        if(freePos)
+        {
+            GameObject enemy = Instantiate(enemyPrefab, freePos.position, Quaternion.identity) as GameObject;
+            enemy.transform.parent = freePos;
+        }
+        if (getNextFreePosition()) { 
+        Invoke("SpawnUntilFull", spawnDelay);
+        }
+    }
+    bool allMembersDead()
+    {
+        foreach (Transform childPositionGameObject in transform)
+        {
+            if (childPositionGameObject.childCount > 1)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
     // Update is called once per frame
     void Update()
     {
         //Restricts movement on X-axis
+        if(allMembersDead())
+        {
+            SpawnUntilFull();
+        }
         if (movingRight)
         {
             transform.position += Vector3.right * speed * Time.deltaTime;

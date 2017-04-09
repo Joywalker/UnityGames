@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
 
@@ -8,8 +6,9 @@ public class PlayerController : MonoBehaviour {
     public float padding = 1.0f;
     float xmin = -5;
     float xmax = 5;
-    public float laserSpeed = 9f;
-    public float fireRate = 0.2f;
+    public float laserSpeed = 6f;
+    public float fireRate = 2f;
+    public float health = 300f;
     public GameObject projectile;
 	// Use this for initialization
 	void Start () {
@@ -22,7 +21,8 @@ public class PlayerController : MonoBehaviour {
 
     void fireLaser()
     {
-        GameObject laser = Instantiate(projectile, transform.position, Quaternion.identity) as GameObject;
+        Vector3 offSet = new Vector3(0, 1, 0);
+        GameObject laser = Instantiate(projectile, transform.position + offSet, Quaternion.identity) as GameObject;
         laser.GetComponent<Rigidbody2D>().velocity = new Vector3(0, laserSpeed, 0);
     }
 
@@ -30,7 +30,7 @@ public class PlayerController : MonoBehaviour {
     void Update () {
         if(Input.GetKeyDown(KeyCode.Space))
         {
-            InvokeRepeating("fireLaser", 0.000001f, fireRate);
+            InvokeRepeating("fireLaser", 0.0001f, fireRate);
         }
         if(Input.GetKeyUp(KeyCode.Space))
         {
@@ -50,4 +50,18 @@ public class PlayerController : MonoBehaviour {
         float newX = Mathf.Clamp(transform.position.x, xmin, xmax);
         transform.position = new Vector3(newX, transform.position.y, transform.position.z);
 	}
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        ProjectileScript missile = collision.gameObject.GetComponent<ProjectileScript>();
+        if (missile)
+        {
+            health -= missile.getDamageFunction();
+            missile.Hit();
+            if (health <= 0)
+            {
+                Destroy(gameObject);
+            }
+        }
+    }
 }
