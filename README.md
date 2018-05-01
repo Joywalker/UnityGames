@@ -1,4 +1,8 @@
 # UnityGames
 
-//TODO : config gitignore to remove files like mp3/wav etc.
-         also .m files (Maya)
+
+<h1> Laser Defender </h1>
+         <p> 2D Scroller space shooter game.</p>
+         
+<h1> Rabbit </h1>
+         <p> 2D Platformer </p>
